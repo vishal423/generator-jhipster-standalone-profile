@@ -13,9 +13,8 @@ describe('generator-jhipster-standalone-profile:app', () => {
         fs.copySync(path.join(__dirname, '../__tests__/templates/microservice/'), dir);
       })
       .then(() => {
-        const resourceDir = jhipsterConstants.SERVER_MAIN_RES_DIR;
-        const configPath = `${resourceDir}config/application-standalone.yml`;
-        assert.file([configPath]);
+        assert.file([`${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`]);
+        assert.fileContent('pom.xml', /dev,standalone,\${profile.swagger}\${profile.no-liquibase}/);
       });
   });
 });

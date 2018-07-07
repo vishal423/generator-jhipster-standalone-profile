@@ -1,7 +1,6 @@
 'use strict';
 
 const chalk = require('chalk');
-
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 
@@ -20,20 +19,31 @@ module.exports = class extends BaseGenerator {
     };
   }
 
-  writing() {
-    this.template = (source, destination) => {
-      this.fs.copyTpl(this.templatePath(source), this.destinationPath(destination), this);
+  get writing() {
+    return {
+      copySpringProfileConfiguration() {
+        const resourceDir = jhipsterConstants.SERVER_MAIN_RES_DIR;
+        const configPath = `${resourceDir}config/application-standalone.yml`;
+        const applicationType = this.jhipsterAppConfig.applicationType;
+        switch (applicationType) {
+          case 'microservice':
+            this.template('microservice-standalone.yml', configPath);
+            break;
+          default:
+            this.error(`Unsupported application type : ${applicationType}`);
+        }
+      },
+      addMavenProfile() {
+        const buildTool = this.jhipsterAppConfig.buildTool;
+        if (buildTool === 'maven') {
+          this.render('pom-profile.xml.ejs', rendered => {
+            this.addMavenProfile('standalone', `            ${rendered.trim()}`);
+          });
+        } else {
+          this.error(`Unsupported build tool : ${buildTool}`);
+        }
+      }
     };
-    const resourceDir = jhipsterConstants.SERVER_MAIN_RES_DIR;
-    const configPath = `${resourceDir}config/application-standalone.yml`;
-    const applicationType = this.jhipsterAppConfig.applicationType;
-    switch (applicationType) {
-      case 'microservice':
-        this.template('microservice-standalone.yml', configPath);
-        break;
-      default:
-        this.error(`Unsupported application type : ${applicationType}`);
-    }
   }
 
   end() {
