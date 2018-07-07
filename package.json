@@ -47,7 +47,7 @@
     "prepublishOnly": "nsp check",
     "pretest": "eslint .",
     "precommit": "lint-staged",
-    "test": "jest"
+    "test": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "lint-staged": {
     "*.js": [
