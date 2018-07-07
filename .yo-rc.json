@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Vishal Mahajan",
+      "authorEmail": "vishal423@gmail.com",
+      "authorUrl": ""
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "test"
+    },
+    "jhipsterVersion": "4.14.4",
+    "baseName": "test",
+    "packageName": "test",
+    "packageFolder": "test",
+    "serverPort": "8081",
+    "authenticationType": "uaa",
+    "uaaBaseName": "uaaserver",
+    "hibernateCache": "no",
+    "clusteredHttpSession": false,
+    "websocket": false,
+    "databaseType": "no",
+    "devDatabaseType": "no",
+    "prodDatabaseType": "no",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSocialSignIn": false,
+    "jwtSecretKey": "secret",
+    "enableTranslation": false,
+    "applicationType": "microservice",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "skipClient": true,
+    "skipUserManagement": true,
+    "clientPackageManager": "yarn",
+    "cacheProvider": "no",
+    "enableHibernateCache": false
+  }
+}
