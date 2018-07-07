@@ -48,5 +48,6 @@ module.exports = class extends BaseGenerator {
 
   end() {
     this.log('Spring boot standalone profile successfully configured in your Jhipster application.');
+    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do development in standalone mode`);
   }
 };

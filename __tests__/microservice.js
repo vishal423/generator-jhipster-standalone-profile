@@ -14,7 +14,7 @@ describe('generator-jhipster-standalone-profile:app', () => {
       })
       .then(() => {
         assert.file([`${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`]);
-        assert.fileContent('pom.xml', /dev,standalone,\${profile.swagger}\${profile.no-liquibase}/);
+        assert.fileContent('pom.xml', /dev,standalone\${profile.swagger}\${profile.no-liquibase}/);
       });
   });
 });

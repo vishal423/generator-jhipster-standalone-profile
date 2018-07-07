@@ -3,7 +3,13 @@
 
 # Introduction
 
-This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application.
+This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. It adds spring boot `standalone` profile on top of `dev` profile to disable concerns not required during standalone development.
+
+It effectively set following configurations:
+- Bypass Spring security
+- Disable service registration and discovery
+- Enable CORS
+
 
 # Pre-requisites
 
@@ -19,12 +25,16 @@ yarn global add generator-jhipster-standalone-profile
 
 # Usage
 - Navigate to Jhipster application root directory.
-- Execute standalone-profile generator with following command:
+- Use following command to add standalone profile support:
 
   ```bash
   yo jhipster-standalone-profile
   ```
-
+- Resolve conficts, if any.
+- Use following command to do development in standalone mode:
+  ```bash
+  ./mvnw -Pdev,standalone
+  ```
 ## License
 
 MIT © [Vishal Mahajan]()
