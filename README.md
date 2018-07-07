@@ -46,5 +46,5 @@ MIT © [Vishal Mahajan]()
 [travis-url]: https://travis-ci.org/vishal423/generator-jhipster-standalone-profile
 [daviddm-image]: https://david-dm.org/vishal423/generator-jhipster-standalone-profile.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/vishal423/generator-jhipster-standalone-profile
-[coveralls-image]: https://coveralls.io/repos/vishal423/generator-jhipster-standalone-profile/badge.svg
-[coveralls-url]: https://coveralls.io/r/vishal423/generator-jhipster-standalone-profile
+[coveralls-image]: https://coveralls.io/repos/github/vishal423/generator-jhipster-standalone-profile/badge.svg
+[coveralls-url]: https://coveralls.io/github/vishal423/generator-jhipster-standalone-profile
