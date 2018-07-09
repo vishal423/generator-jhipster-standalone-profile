@@ -28,6 +28,15 @@ module.exports = class extends BaseGenerator {
         switch (applicationType) {
           case 'microservice':
             this.template('microservice-standalone.yml', configPath);
+            this.render('README.md.ejs', content => {
+              this.replaceContent(
+                'README.md',
+                /## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*## Building for production/g,
+                '## Building for production',
+                true
+              );
+              this.replaceContent('README.md', /## Building for production\n/, content, true);
+            });
             break;
           default:
             this.error(`Unsupported application type : ${applicationType}`);
@@ -48,6 +57,6 @@ module.exports = class extends BaseGenerator {
 
   end() {
     this.log('Spring boot standalone profile successfully configured in your Jhipster application.');
-    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do development in standalone mode`);
+    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do development in the standalone mode`);
   }
 };

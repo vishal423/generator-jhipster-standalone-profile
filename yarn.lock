@@ -5083,7 +5083,7 @@ yeoman-generator@2.0.5, yeoman-generator@^2.0.5:
     through2 "^2.0.0"
     yeoman-environment "^2.0.5"
 
-yeoman-generator@^3.0.0:
+"yeoman-generator@^2.0.1 || ^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/yeoman-generator/-/yeoman-generator-3.0.0.tgz#fee1d034231720cbd75d4acfd447dafd2f279117"
   dependencies:
