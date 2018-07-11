@@ -9,6 +9,10 @@ module.exports = class extends BaseGenerator {
     return {
       readConfig() {
         this.jhipsterAppConfig = this.getJhipsterAppConfig();
+
+        if (!this.jhipsterAppConfig.jhipsterVersion.startsWith('4.14')) {
+          this.error('This module supports Jhipster applications generated with v4.14.x');
+        }
         if (!this.jhipsterAppConfig) {
           this.error('.yo-rc.json not found');
         }
@@ -27,7 +31,8 @@ module.exports = class extends BaseGenerator {
         const applicationType = this.jhipsterAppConfig.applicationType;
         switch (applicationType) {
           case 'microservice':
-            this.template('microservice-standalone.yml', configPath);
+          case 'monolith':
+            this.template('application-standalone.yml.ejs', configPath, this, {}, this.jhipsterAppConfig);
             this.render('README.md.ejs', content => {
               this.replaceContent(
                 'README.md',
