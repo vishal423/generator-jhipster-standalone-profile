@@ -6,7 +6,7 @@ const helpers = require('yeoman-test');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 
 describe('generator-jhipster-standalone-profile:app', () => {
-  it('creates standalone profile configuration file', () => {
+  it('creates spring boot configuration file, maven profile and update readme', () => {
     return helpers
       .run(path.join(__dirname, '../generators/app'))
       .inTmpDir(dir => {

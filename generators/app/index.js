@@ -3,13 +3,17 @@
 const chalk = require('chalk');
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
-
 module.exports = class extends BaseGenerator {
+  constructor(args, opts) {
+    super(args, opts);
+    this.jhipsterAppConfig = this.getJhipsterAppConfig();
+    this.srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${this.jhipsterAppConfig.packageFolder}/config/`;
+    this.applicationType = this.jhipsterAppConfig.applicationType;
+  }
+
   get initializing() {
     return {
       readConfig() {
-        this.jhipsterAppConfig = this.getJhipsterAppConfig();
-
         if (!this.jhipsterAppConfig.jhipsterVersion.startsWith('4.14')) {
           this.error('This module supports Jhipster applications generated with v4.14.x');
         }
@@ -25,13 +29,47 @@ module.exports = class extends BaseGenerator {
 
   get writing() {
     return {
-      copySpringProfileConfiguration() {
-        const resourceDir = jhipsterConstants.SERVER_MAIN_RES_DIR;
-        const configPath = `${resourceDir}config/application-standalone.yml`;
-        const applicationType = this.jhipsterAppConfig.applicationType;
-        switch (applicationType) {
-          case 'microservice':
+      handleWebAppSecurityConfiguration() {
+        switch (this.applicationType) {
           case 'monolith':
+            this.template(
+              'StandaloneSecurityConfiguration.java.ejs',
+              `${this.srcConfigPath}/StandaloneSecurityConfiguration.java`,
+              this,
+              {},
+              this.jhipsterAppConfig
+            );
+            this.replaceContent(
+              `${this.srcConfigPath}SecurityConfiguration.java`,
+              /(@Profile\("!standalone"\)\n)|(import org\.springframework\.context\.annotation\.Profile;\n)/g,
+              '',
+              true
+            );
+            this.replaceContent(
+              `${this.srcConfigPath}SecurityConfiguration.java`,
+              '@EnableWebSecurity\n',
+              '@EnableWebSecurity\n@Profile("!standalone")\n',
+              false
+            );
+            this.replaceContent(
+              `${this.srcConfigPath}SecurityConfiguration.java`,
+              'import org.springframework.context.annotation.Import;\n',
+              'import org.springframework.context.annotation.Import;\nimport org.springframework.context.annotation.Profile;\n',
+              false
+            );
+            break;
+          case 'microservice':
+            break;
+          default:
+            this.error(`Unsupported application type : ${this.applicationType}`);
+        }
+      },
+      copySpringProfileConfiguration() {
+        const configPath = `${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`;
+
+        switch (this.applicationType) {
+          case 'monolith':
+          case 'microservice':
             this.template('application-standalone.yml.ejs', configPath, this, {}, this.jhipsterAppConfig);
             this.render('README.md.ejs', content => {
               this.replaceContent(
@@ -44,7 +82,7 @@ module.exports = class extends BaseGenerator {
             });
             break;
           default:
-            this.error(`Unsupported application type : ${applicationType}`);
+            this.error(`Unsupported application type : ${this.applicationType}`);
         }
       },
       addMavenProfile() {
