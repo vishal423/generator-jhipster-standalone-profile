@@ -1,6 +1,6 @@
 {
   "name": "generator-jhipster-standalone-profile",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Add standalone profile to Jhipster application",
   "homepage": "https://github.com/vishal423/generator-jhipster-standalone-profile",
   "author": {
