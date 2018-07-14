@@ -6,7 +6,14 @@ const jhipsterConstants = require('generator-jhipster/generators/generator-const
 module.exports = class extends BaseGenerator {
   constructor(args, opts) {
     super(args, opts);
-    this.jhipsterAppConfig = this.getJhipsterAppConfig();
+    if (this.destinationPath('.yo-rc.json')) {
+      const fileData = this.fs.readJSON(this.destinationPath('.yo-rc.json'));
+      if (fileData && fileData['generator-jhipster']) {
+        this.jhipsterAppConfig = fileData['generator-jhipster'];
+      } else {
+        this.error('.yo-rc.json not found');
+      }
+    }
     this.srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${this.jhipsterAppConfig.packageFolder}/config/`;
     this.applicationType = this.jhipsterAppConfig.applicationType;
   }
@@ -16,9 +23,6 @@ module.exports = class extends BaseGenerator {
       readConfig() {
         if (!this.jhipsterAppConfig.jhipsterVersion.startsWith('4.14')) {
           this.error('This module supports Jhipster applications generated with v4.14.x');
-        }
-        if (!this.jhipsterAppConfig) {
-          this.error('.yo-rc.json not found');
         }
       },
       banner() {
@@ -30,67 +34,54 @@ module.exports = class extends BaseGenerator {
   get writing() {
     return {
       handleWebAppSecurityConfiguration() {
-        switch (this.applicationType) {
-          case 'monolith':
-            this.template(
-              'StandaloneSecurityConfiguration.java.ejs',
-              `${this.srcConfigPath}/StandaloneSecurityConfiguration.java`,
-              this,
-              {},
+        const existingContent = this.fs.read(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), {
+          defaults: 'dummy'
+        });
+        if (existingContent !== 'dummy') {
+          if (existingContent.indexOf('@EnableWebSecurity') !== -1) {
+            this.fs.copyTpl(
+              this.templatePath('StandaloneSecurityConfiguration.java.ejs'),
+              this.destinationPath(`${this.srcConfigPath}StandaloneSecurityConfiguration.java`),
               this.jhipsterAppConfig
             );
-            this.replaceContent(
-              `${this.srcConfigPath}SecurityConfiguration.java`,
-              /(@Profile\("!standalone"\)\n)|(import org\.springframework\.context\.annotation\.Profile;\n)/g,
-              '',
-              true
+
+            let updatedContent = existingContent.replace(
+              /@EnableWebSecurity\n(@Profile\("!standalone"\)\n)?/g,
+              '@EnableWebSecurity\n@Profile("!standalone")\n'
             );
-            this.replaceContent(
-              `${this.srcConfigPath}SecurityConfiguration.java`,
-              '@EnableWebSecurity\n',
-              '@EnableWebSecurity\n@Profile("!standalone")\n',
-              false
+            updatedContent = updatedContent.replace(
+              /import\sorg\.springframework\.context\.annotation\.Import;\n(import\sorg\.springframework\.context\.annotation\.Profile;\n)?/g,
+              'import org.springframework.context.annotation.Import;\nimport org.springframework.context.annotation.Profile;\n'
             );
-            this.replaceContent(
-              `${this.srcConfigPath}SecurityConfiguration.java`,
-              'import org.springframework.context.annotation.Import;\n',
-              'import org.springframework.context.annotation.Import;\nimport org.springframework.context.annotation.Profile;\n',
-              false
-            );
-            break;
-          case 'microservice':
-            break;
-          default:
-            this.error(`Unsupported application type : ${this.applicationType}`);
+
+            this.fs.write(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), updatedContent);
+          }
         }
       },
       copySpringProfileConfiguration() {
         const configPath = `${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`;
-
-        switch (this.applicationType) {
-          case 'monolith':
-          case 'microservice':
-            this.template('application-standalone.yml.ejs', configPath, this, {}, this.jhipsterAppConfig);
-            this.render('README.md.ejs', content => {
-              this.replaceContent(
-                'README.md',
-                /## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*## Building for production/g,
-                '## Building for production',
-                true
-              );
-              this.replaceContent('README.md', /## Building for production\n/, content, true);
-            });
-            break;
-          default:
-            this.error(`Unsupported application type : ${this.applicationType}`);
+        this.fs.copyTpl(
+          this.templatePath('application-standalone.yml.ejs'),
+          this.destinationPath(configPath),
+          this.jhipsterAppConfig
+        );
+      },
+      updateReadme() {
+        const newContent = this.fs.read(this.templatePath('README.md.ejs'));
+        const existingContent = this.fs.read(this.destinationPath('README.md'), { defaults: 'dummy' });
+        if (existingContent !== 'dummy') {
+          const updatedContent = existingContent.replace(
+            /(## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*)?## Building for production\n/g,
+            newContent
+          );
+          this.fs.write(this.destinationPath('README.md'), updatedContent);
         }
       },
       addMavenProfile() {
         const buildTool = this.jhipsterAppConfig.buildTool;
         if (buildTool === 'maven') {
-          this.render('pom-profile.xml.ejs', rendered => {
-            this.addMavenProfile('standalone', `            ${rendered.trim()}`);
-          });
+          const newContent = this.fs.read(this.templatePath('pom-profile.xml.ejs'));
+          this.addMavenProfile('standalone', `            ${newContent.trim()}`);
         } else {
           this.error(`Unsupported build tool : ${buildTool}`);
         }

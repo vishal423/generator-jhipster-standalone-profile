@@ -10,7 +10,7 @@ describe('generator-jhipster-standalone-profile:app', () => {
     return helpers
       .run(path.join(__dirname, '../generators/app'))
       .inTmpDir(dir => {
-        fs.copySync(path.join(__dirname, '../__tests__/templates/monolith/'), dir);
+        fs.copySync(path.join(__dirname, './templates/monolith/'), dir);
       })
       .then(() => {
         assert.file([`${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`]);
@@ -18,7 +18,7 @@ describe('generator-jhipster-standalone-profile:app', () => {
         assert.fileContent('README.md', /## Standalone Development/);
         assert.fileContent('README.md', /\.\/mvnw -Pdev,standalone/);
 
-        const fileData = fs.readJSON('.yo-rc.json');
+        const fileData = fs.readJSONSync('.yo-rc.json');
         if (fileData && fileData['generator-jhipster']) {
           const jhipsterConfig = fileData['generator-jhipster'];
           const srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${jhipsterConfig.packageFolder}/config/`;

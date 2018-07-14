@@ -10,7 +10,7 @@ describe('generator-jhipster-standalone-profile:app', () => {
     return helpers
       .run(path.join(__dirname, '../generators/app'))
       .inTmpDir(dir => {
-        fs.copySync(path.join(__dirname, '../__tests__/templates/microservice/'), dir);
+        fs.copySync(path.join(__dirname, './templates/microservice/'), dir);
       })
       .then(() => {
         assert.file([`${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`]);
