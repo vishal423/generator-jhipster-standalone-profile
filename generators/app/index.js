@@ -58,6 +58,25 @@ module.exports = class extends BaseGenerator {
           }
         }
       },
+      handleOAuth2SecurityConfiguration() {
+        const existingContent = this.fs.read(
+          this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
+          { defaults: 'dummy' }
+        );
+        if (existingContent !== 'dummy') {
+          if (existingContent.indexOf('@EnableResourceServer') !== -1) {
+            let updatedContent = existingContent.replace(
+              /@EnableResourceServer\n(@Profile\("!standalone"\)\n)?/g,
+              '@EnableResourceServer\n@Profile("!standalone")\n'
+            );
+
+            this.fs.write(
+              this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
+              updatedContent
+            );
+          }
+        }
+      },
       copySpringProfileConfiguration() {
         const configPath = `${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`;
         this.fs.copyTpl(

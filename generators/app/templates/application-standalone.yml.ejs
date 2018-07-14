@@ -3,7 +3,7 @@ eureka:
     client:
         enabled: false
 <%_ } _%>
-<%_ if (authenticationType === 'jwt' || authenticationType === 'uaa' || authenticationType === 'session') { _%>
+<%_ if (authenticationType === 'jwt' || authenticationType === 'uaa' || authenticationType === 'session' || authenticationType === 'oauth2') { _%>
 security:
     basic:
         enable: false
