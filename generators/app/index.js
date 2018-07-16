@@ -15,7 +15,6 @@ module.exports = class extends BaseGenerator {
       }
     }
     this.srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${this.jhipsterAppConfig.packageFolder}/config/`;
-    this.applicationType = this.jhipsterAppConfig.applicationType;
   }
 
   get initializing() {
@@ -59,21 +58,23 @@ module.exports = class extends BaseGenerator {
         }
       },
       handleOAuth2SecurityConfiguration() {
-        const existingContent = this.fs.read(
-          this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
-          { defaults: 'dummy' }
-        );
-        if (existingContent !== 'dummy') {
-          if (existingContent.indexOf('@EnableResourceServer') !== -1) {
-            let updatedContent = existingContent.replace(
-              /@EnableResourceServer\n(@Profile\("!standalone"\)\n)?/g,
-              '@EnableResourceServer\n@Profile("!standalone")\n'
-            );
+        if (this.jhipsterAppConfig.authenticationType !== 'uaa') {
+          const existingContent = this.fs.read(
+            this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
+            { defaults: 'dummy' }
+          );
+          if (existingContent !== 'dummy') {
+            if (existingContent.indexOf('@EnableResourceServer') !== -1) {
+              let updatedContent = existingContent.replace(
+                /@EnableResourceServer\n(@Profile\("!standalone"\)\n)?/g,
+                '@EnableResourceServer\n@Profile("!standalone")\n'
+              );
 
-            this.fs.write(
-              this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
-              updatedContent
-            );
+              this.fs.write(
+                this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
+                updatedContent
+              );
+            }
           }
         }
       },
