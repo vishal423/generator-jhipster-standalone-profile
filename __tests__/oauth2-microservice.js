@@ -22,7 +22,10 @@ describe('generator-jhipster-standalone-profile:app', () => {
         if (fileData && fileData['generator-jhipster']) {
           const jhipsterConfig = fileData['generator-jhipster'];
           const srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${jhipsterConfig.packageFolder}/config/`;
-          assert.fileContent(`${srcConfigPath}MicroserviceSecurityConfiguration.java`, /@Profile\("!standalone"\)/);
+          assert.file([`${srcConfigPath}StandaloneSecurityConfiguration.java`]);
+          assert.fileContent(`${srcConfigPath}StandaloneSecurityConfiguration.java`, /@Profile\("standalone"\)/);
+
+          assert.fileContent(`${srcConfigPath}SecurityConfiguration.java`, /@Profile\("!standalone"\)/);
         }
       });
   });

@@ -20,12 +20,10 @@ module.exports = class extends BaseGenerator {
   get initializing() {
     return {
       readConfig() {
-        if (!this.jhipsterAppConfig.jhipsterVersion.startsWith('4.14')) {
-          this.error('This module supports Jhipster applications generated with v4.14.x');
-        }
+        // Read config
       },
       banner() {
-        this.log(`Welcome to the ${chalk.bold.yellow('Spring boot standalone profile')} configurer!`);
+        this.log(`Welcome to the ${chalk.bold.green('Standalone profile')} configurer!`);
       }
     };
   }
@@ -37,43 +35,33 @@ module.exports = class extends BaseGenerator {
           defaults: 'dummy'
         });
         if (existingContent !== 'dummy') {
-          if (existingContent.indexOf('@EnableWebSecurity') !== -1) {
+          if (
+            existingContent.indexOf('@EnableWebSecurity') !== -1 ||
+            existingContent.indexOf('@EnableResourceServer') !== -1
+          ) {
             this.fs.copyTpl(
               this.templatePath('StandaloneSecurityConfiguration.java.ejs'),
               this.destinationPath(`${this.srcConfigPath}StandaloneSecurityConfiguration.java`),
               this.jhipsterAppConfig
             );
 
-            let updatedContent = existingContent.replace(
-              /@EnableWebSecurity\n(@Profile\("!standalone"\)\n)?/g,
-              '@EnableWebSecurity\n@Profile("!standalone")\n'
-            );
-            updatedContent = updatedContent.replace(
-              /import\sorg\.springframework\.context\.annotation\.Import;\n(import\sorg\.springframework\.context\.annotation\.Profile;\n)?/g,
-              'import org.springframework.context.annotation.Import;\nimport org.springframework.context.annotation.Profile;\n'
-            );
-
-            this.fs.write(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), updatedContent);
-          }
-        }
-      },
-      handleOAuth2SecurityConfiguration() {
-        if (this.jhipsterAppConfig.authenticationType !== 'uaa') {
-          const existingContent = this.fs.read(
-            this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
-            { defaults: 'dummy' }
-          );
-          if (existingContent !== 'dummy') {
-            if (existingContent.indexOf('@EnableResourceServer') !== -1) {
+            if (existingContent.indexOf('@Profile("!standalone")') === -1) {
               let updatedContent = existingContent.replace(
+                /@EnableWebSecurity\n(@Profile\("!standalone"\)\n)?/g,
+                '@EnableWebSecurity\n@Profile("!standalone")\n'
+              );
+              updatedContent = updatedContent.replace(
                 /@EnableResourceServer\n(@Profile\("!standalone"\)\n)?/g,
                 '@EnableResourceServer\n@Profile("!standalone")\n'
               );
 
-              this.fs.write(
-                this.destinationPath(`${this.srcConfigPath}MicroserviceSecurityConfiguration.java`),
-                updatedContent
-              );
+              if (updatedContent.indexOf('import org.springframework.context.annotation.Profile;') === -1) {
+                updatedContent = updatedContent.replace(
+                  /import\sorg\.springframework\.context\.annotation\.Configuration;\n(import\sorg\.springframework\.context\.annotation\.Profile;\n)?/g,
+                  'import org.springframework.context.annotation.Configuration;\nimport org.springframework.context.annotation.Profile;\n'
+                );
+              }
+              this.fs.write(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), updatedContent);
             }
           }
         }

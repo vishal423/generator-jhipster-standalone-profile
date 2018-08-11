@@ -3,15 +3,6 @@ eureka:
     client:
         enabled: false
 <%_ } _%>
-<%_ if (authenticationType === 'jwt' || authenticationType === 'uaa' || authenticationType === 'session' || authenticationType === 'oauth2') { _%>
-security:
-    basic:
-        enable: false
-    ignored: /**
-management:
-    security:
-        enabled: false
-<%_ } _%>
 jhipster:
     cors:
         allowed-origins: '*'

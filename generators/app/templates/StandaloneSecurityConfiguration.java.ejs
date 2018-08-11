@@ -1,17 +1,107 @@
 package <%=packageName%>.config;
-
+<% if (authenticationType === 'uaa') { %>import <%=packageName%>.config.oauth2.OAuth2Properties;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;<% } %>
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+<% if (authenticationType === 'uaa' || authenticationType === 'oauth2' ) { %>import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;<% } %>
+<% if (authenticationType === 'oauth2') { %>import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;<% } %>
+<% if (authenticationType === 'uaa' || authenticationType === 'oauth2' ) { %>import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+<% } if (authenticationType === 'uaa') { %>import org.springframework.web.client.RestTemplate;
+<% } else if (authenticationType === 'jwt') { %>import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import org.springframework.web.filter.CorsFilter;
+<% } %>
 @Configuration
 @Profile("standalone")
-public class StandaloneSecurityConfiguration {
+<% if (authenticationType === 'uaa' || authenticationType === 'oauth2' ) { %>@EnableResourceServer<% } else if (authenticationType === 'jwt') { %>@EnableWebSecurity<% } %>
+public class StandaloneSecurityConfiguration <% if (authenticationType === 'uaa' || authenticationType === 'oauth2' ) { %>extends ResourceServerConfigurerAdapter <% } %><% if (authenticationType === 'jwt') { %>extends WebSecurityConfigurerAdapter <% } %>{
+    <%_ if (authenticationType === 'uaa' || authenticationType === 'oauth2')  { _%>
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        http
+            .csrf()
+            .disable()
+            .headers()
+            .frameOptions()
+            .disable()
+        .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+            .authorizeRequests()
+            .antMatchers("/**").permitAll();
+    }
+    <% if (authenticationType === 'uaa') { %>
+    @Bean
+	  @Qualifier("loadBalancedRestTemplate")
+    public RestTemplate loadBalancedRestTemplate(RestTemplateCustomizer customizer) {
+        RestTemplate restTemplate = new RestTemplate();
+        customizer.customize(restTemplate);
+        return restTemplate;
+    }
+
+    @Bean
+    @Qualifier("vanillaRestTemplate")
+    public RestTemplate vanillaRestTemplate() {
+        return new RestTemplate();
+    }
+    <% } else if (authenticationType === 'oauth2') { %>
+    @Bean
+    public OAuth2RestTemplate oAuth2RestTemplate(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
+                                                 OAuth2ClientContext oAuth2ClientContext) {
+        return new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
+    }<% } %>
+    <%_ } else if (authenticationType === 'jwt') { %>
+    private final CorsFilter corsFilter;
+
+    public StandaloneSecurityConfiguration(CorsFilter corsFilter) {
+        this.corsFilter = corsFilter;
+    }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+            .antMatchers("/**");
+    }
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        http
+            .csrf()
+            .disable()
+            .addFilter(corsFilter)
+            .headers()
+            .frameOptions()
+            .disable()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+            .antMatchers("/**").permitAll();
+    }
+  <%_ } _%>
 }

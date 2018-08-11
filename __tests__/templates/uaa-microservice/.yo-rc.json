@@ -1,35 +1,36 @@
 {
   "generator-jhipster": {
     "promptValues": {
-      "packageName": "test"
+      "packageName": "test",
+      "nativeLanguage": "en"
     },
-    "jhipsterVersion": "4.14.4",
-    "baseName": "test",
+    "jhipsterVersion": "5.1.0",
+    "applicationType": "microservice",
+    "baseName": "msvc",
     "packageName": "test",
     "packageFolder": "test",
     "serverPort": "8081",
     "authenticationType": "uaa",
-    "uaaBaseName": "uaaserver",
-    "hibernateCache": "no",
-    "clusteredHttpSession": false,
+    "uaaBaseName": "uaa",
+    "cacheProvider": "ehcache",
+    "enableHibernateCache": true,
     "websocket": false,
-    "databaseType": "no",
-    "devDatabaseType": "no",
-    "prodDatabaseType": "no",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "postgresql",
     "searchEngine": false,
     "messageBroker": false,
     "serviceDiscoveryType": "eureka",
     "buildTool": "maven",
-    "enableSocialSignIn": false,
-    "jwtSecretKey": "secret",
-    "enableTranslation": false,
-    "applicationType": "microservice",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "<secret>",
+    "enableTranslation": true,
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "skipClient": true,
-    "skipUserManagement": true,
     "clientPackageManager": "yarn",
-    "cacheProvider": "no",
-    "enableHibernateCache": false
+    "nativeLanguage": "en",
+    "languages": ["en"],
+    "skipClient": true,
+    "skipUserManagement": true
   }
 }
