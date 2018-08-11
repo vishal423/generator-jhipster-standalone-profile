@@ -26,6 +26,8 @@ Use following command to globally install this module:
 ```bash
 yarn global add generator-jhipster-standalone-profile
 ```
+>Note:
+If you are using Jhipster v4.14.x generated applications, then, use 1.x version.
 
 # Usage
 - Navigate to Jhipster application root directory.
