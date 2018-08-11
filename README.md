@@ -1,15 +1,19 @@
 # generator-jhipster-standalone-profile [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url] [![code style: prettier][prettier-image]][prettier-url]
-> Add Spring boot standalone profile support in Jhipster applications
+> Add Standalone profile support in Jhipster applications
 
 # Introduction
 
-This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. It adds spring boot `standalone` profile on top of `dev` profile to disable concerns not required during standalone development. This is particularly useful when building with microservices architecture as you don't need to start Registry, Gateway, UAA in standalone mode.
+This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. During development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `Jhipster Registry` and `UAA` / `OpenID connect` server. Scaling, security are not concerns during development and often adds an additional overhead.
 
-It effectively set following configurations:
-- Bypass Spring security
-- Disable service registration and discovery
-- Enable CORS
+To simplify development experience, this module adds new spring boot `standalone` profile and integrates with corresponding `standalone` maven profile. It is an add-on profile like `no-liquibase` and should be used along with main profile like `dev`.
 
+This module supports following authentication types:
+- OIDC
+- UAA
+- JWT
+
+This module supports following discovery services:
+- Jhipster Registry (Eureka)
 
 # Pre-requisites
 
