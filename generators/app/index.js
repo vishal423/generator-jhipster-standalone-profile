@@ -1,6 +1,8 @@
 'use strict';
 
 const chalk = require('chalk');
+const standalonePackageJson = require('../../package.json');
+
 const BaseGenerator = require('generator-jhipster/generators/generator-base');
 const jhipsterConstants = require('generator-jhipster/generators/generator-constants');
 module.exports = class extends BaseGenerator {
@@ -23,7 +25,14 @@ module.exports = class extends BaseGenerator {
         // Read config
       },
       banner() {
-        this.log(`Welcome to the ${chalk.bold.green('Standalone profile')} configurer!`);
+        /* eslint-disable */
+        this.log(`${chalk.green('███████  ████████     ██      ██     ██  ██████         ██      ██       ███████   ██     ██  ██████ ')}`);
+        this.log(`${chalk.green('██          ██       ████     ███    ██  ██    ██      ████     ██      ██     ██  ███    ██  ██     ')}`);
+        this.log(`${chalk.green('███████     ██      ██  ██    ██ ██  ██  ██     ██    ██  ██    ██      ██     ██  ██ ██  ██  █████  ')}`);
+        this.log(`${chalk.green('     ██     ██     ████████   ██   ████  ██    ██    ████████   ██      ██     ██  ██   ████  ██     ')}`);
+        this.log(`${chalk.green('███████     ██    ██      ██  ██     ██  ██████     ██      ██  ██████   ███████   ██     ██  ██████ ')}`);
+        /* eslint-disable */
+        this.log(`Welcome to the ${chalk.bold.green('Standalone profile')} ${chalk.yellow(`v${standalonePackageJson.version}`)} configurer!`);
       }
     };
   }
