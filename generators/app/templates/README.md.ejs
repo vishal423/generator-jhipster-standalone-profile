@@ -1,8 +1,11 @@
-## Standalone Development
+### Standalone Development
 
-During development, you can disable cross cutting concerns (discovery, security, cors etc), with an add-on standalone profile. Simply run:
+During backend development, you can disable cross cutting concerns (discovery, security, cors etc), with an add-on standalone profile. Simply run:
 
     ./mvnw -Pdev,standalone
 
+To start frontend in standalone mode, use following script:
+
+    %clientPackageManager% start:standalone
 
 ## Building for production

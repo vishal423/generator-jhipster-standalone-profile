@@ -87,9 +87,14 @@ module.exports = class extends BaseGenerator {
         const newContent = this.fs.read(this.templatePath('README.md.ejs'));
         const existingContent = this.fs.read(this.destinationPath('README.md'), { defaults: 'dummy' });
         if (existingContent !== 'dummy') {
-          const updatedContent = existingContent.replace(
-            /(## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*)?## Building for production\n/g,
+          let updatedContent = existingContent.replace(
+            /(#?## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*)?## Building for production\n/g,
             newContent
+          );
+
+          updatedContent = updatedContent.replace(
+            /%clientPackageManager%/g,
+            this.jhipsterAppConfig.clientPackageManager
           );
           this.fs.write(this.destinationPath('README.md'), updatedContent);
         }
@@ -102,12 +107,132 @@ module.exports = class extends BaseGenerator {
         } else {
           this.error(`Unsupported build tool : ${buildTool}`);
         }
+      },
+      updatePackageJson() {
+
+        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+          const packageTemplate = this.fs.read(this.templatePath('package.json'));
+          const existingPackageJson = this.fs.read(this.destinationPath('package.json'), { defaults: 'dummy' });
+
+          if(existingPackageJson.indexOf('angular-in-memory-web-api') === -1) {
+            const updatedContent = packageTemplate.replace(
+              /clientPackageManager/g,
+              this.jhipsterAppConfig.clientPackageManager
+            );
+            this.fs.extendJSON(this.destinationPath('package.json'), JSON.parse(updatedContent));
+          }
+        }
+      },
+      updateWebpackConfig() {
+
+        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+          const existingWebpackCommonContent = this.fs.read(this.destinationPath('webpack/webpack.common.js'), {
+            defaults: 'dummy'
+          });
+
+          if (existingWebpackCommonContent !== 'dummy') {
+            const updatedWebpackCommonContent = existingWebpackCommonContent.replace(
+              /SERVER_API_URL:\s*`''`\s*(,\n\s*BUILD_PROFILE:\s*`'\$\{options.profile\}'`)?/g,
+              'SERVER_API_URL: `\'\'`,\n                BUILD_PROFILE: `\'${options.profile}\'`'
+            );
+
+            this.fs.write(this.destinationPath('webpack/webpack.common.js'), updatedWebpackCommonContent);
+          }
+
+          const existingWebpackDevContent = this.fs.read(this.destinationPath('webpack/webpack.dev.js'), {
+            defaults: 'dummy'
+          });
+
+          if (existingWebpackDevContent !== 'dummy') {
+            const updatedWebpackDevContent = existingWebpackDevContent.replace(
+              /{\s*env:\s*ENV(,\s*profile:\s*options.profile)?/g,
+              '{ env: ENV, profile: options.profile'
+            );
+
+            this.fs.write(this.destinationPath('webpack/webpack.dev.js'), updatedWebpackDevContent);
+          }
+        }
+      },
+      updateFrontendFiles() {
+
+        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+
+          const clientDir = jhipsterConstants.CLIENT_MAIN_SRC_DIR;
+          const existingConstantsContent = this.fs.read(this.destinationPath(`${clientDir}/app/app.constants.ts`), {
+            defaults: 'dummy'
+          });
+
+          if (existingConstantsContent !== 'dummy'
+            && existingConstantsContent.indexOf('BUILD_PROFILE') === -1) {
+            this.fs.append(this.destinationPath(`${clientDir}/app/app.constants.ts`),
+            'export const BUILD_PROFILE = process.env.BUILD_PROFILE;\n',
+            { trimEnd: false });
+          }
+
+          // update core.module
+          const existingCoreModuleContent = this.fs.read(this.destinationPath(`${clientDir}/app/core/core.module.ts`), {
+            defaults: 'dummy'
+          });
+
+          if (existingCoreModuleContent !== 'dummy') {
+            let updatedCoreModuleContent = existingCoreModuleContent.replace(
+              /(\n?import\s*\{\s*HttpClientInMemoryWebApiModule\s*\}\s*from([\n\t\sa-zA-Z0-9_,\-:\{\}.;/\()[\]'])*)?\n@NgModule\({/g,
+              `\nimport { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';\nimport { InMemoryDataService } from 'app/core/in-memory-data.service';\nimport { BUILD_PROFILE } from 'app/app.constants';\n\n@NgModule({`
+            );
+            //(,\n\s*([\n\s\tA-Za-z0-9='_\-?.\():\{\}])*\[])?
+            updatedCoreModuleContent = updatedCoreModuleContent.replace(
+              /imports:\s*\[\s*\n?\s*HttpClientModule(,([\n\s\tA-Za-z0-9='_\-?.,\():\{\}])*\[]\s*)?/g,
+              `imports: [\n        HttpClientModule,\n        BUILD_PROFILE === 'standalone'\n            ? HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, { delay: 2000, passThruUnknownUrl: true })\n            : []\n    `
+            );
+
+            this.fs.write(this.destinationPath(`${clientDir}/app/core/core.module.ts`), updatedCoreModuleContent);
+          }
+
+          // update translations
+          const existingI18nContent = this.fs.read(this.destinationPath(`${clientDir}/i18n/en/global.json`), {
+            defaults: 'dummy'
+          });
+
+          if (existingI18nContent !== 'dummy') {
+            let updatedI18nContent = existingI18nContent.replace(
+              /(\n\s*"standalone":\s*"Standalone"\s*,\s*\n)?\s*"dev"\s*:\s*"Development"/g,
+              `\n            "standalone": "Standalone",\n            "dev":"Development"`
+            );
+
+            this.fs.write(this.destinationPath(`${clientDir}/i18n/en/global.json`), updatedI18nContent);
+          }
+
+        }
+      },
+      copyInMemoryDataService() {
+        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+          this.fs.copyTpl(
+            this.templatePath('in-memory-data.service.ts.ejs'),
+            this.destinationPath(`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`),
+            this.jhipsterAppConfig
+          );
+        }
       }
     };
   }
 
+  install() {
+    if(this.jhipsterAppConfig.applicationType === 'gateway') {
+      this.log(`Install dependencies using: ${chalk.yellow.bold(`${this.jhipsterAppConfig.clientPackageManager} install`)}`);
+
+      if (this.jhipsterAppConfig.clientPackageManager === 'yarn') {
+        this.yarnInstall();
+      } else {
+        this.npmInstall();
+      }
+  }
+}
+
   end() {
-    this.log('Spring boot standalone profile successfully configured in your Jhipster application.');
-    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do development in the standalone mode`);
+    this.log('Standalone profile successfully configured in your JHipster application.');
+    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do backend development in the standalone mode`);
+    if(this.jhipsterAppConfig.applicationType === 'gateway') {
+      this.log(`Use command ${chalk.bold.yellow('yarn start:standalone')} to do frontend development in the standalone mode`);
+    }
   }
 };

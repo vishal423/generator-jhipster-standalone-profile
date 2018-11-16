@@ -1,9 +1,11 @@
 # generator-jhipster-standalone-profile [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url] [![code style: prettier][prettier-image]][prettier-url]
-> Add Standalone profile support in Jhipster applications
+> Adds Standalone profile support in Jhipster applications
 
 # Introduction
 
-This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. During development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `Jhipster Registry` and `UAA` / `OpenID connect` server. Scaling, security are not concerns during development and often adds an additional overhead.
+This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. During development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `Jhipster Registry` and `UAA` / `OpenID Connect` server. Horizontal scaling, security are not concerns during development and often adds an additional overhead.
+
+## Services
 
 To simplify development experience, this module adds new spring boot `standalone` profile and integrates with corresponding `standalone` maven profile. It is an add-on profile like `no-liquibase` and should be used along with main profile like `dev`.
 
@@ -12,8 +14,18 @@ This module supports following authentication types:
 - UAA
 - JWT
 
+>Note: On `gateway` application type, security is not disabled.
+
 This module supports following discovery services:
 - Jhipster Registry (Eureka)
+
+## Frontend
+
+### Angular
+This module leverages angular [in-memory-web-api](https://github.com/angular/in-memory-web-api) module to intercept HTTP requests. To intercept service calls and return mock response, you need to specify collections under:
+```src/main/webapp/app/core/in-memory-data.service.ts```. For more details, refer [in-memory-web-api](https://github.com/angular/in-memory-web-api) documentation. 
+
+>Note: Only `gateway` application type is supported.
 
 # Pre-requisites
 
@@ -37,13 +49,17 @@ If you are using Jhipster v4.14.x generated applications, then, use 1.x version.
   yo jhipster-standalone-profile
   ```
 - Resolve conficts, if any.
-- Use following command to do development in standalone mode:
+- Use following command to start backend services in the standalone mode:
   ```bash
   ./mvnw -Pdev,standalone
   ```
+- Use following command to start angular frontend in the standalone mode:
+  ```bash
+  yarn|npm start:standalone
+  ```
 ## License
 
-MIT © [Vishal Mahajan]()
+MIT © [Vishal Mahajan](https://twitter.com/vishal423)
 
 
 [npm-image]: https://badge.fury.io/js/generator-jhipster-standalone-profile.svg
