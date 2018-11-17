@@ -19,9 +19,3 @@ To ensure everything worked, run:
 
 
 Refer to [Using JHipster in production][] for more details.
-
-## Testing
-
-To launch your application's tests, run:
-
-    ./mvnw clean test

@@ -110,11 +110,12 @@ module.exports = class extends BaseGenerator {
       },
       updatePackageJson() {
 
-        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+        if (this.jhipsterAppConfig.applicationType === 'gateway'
+          && this.jhipsterAppConfig.clientFramework === 'angularX') {
           const packageTemplate = this.fs.read(this.templatePath('package.json'));
           const existingPackageJson = this.fs.read(this.destinationPath('package.json'), { defaults: 'dummy' });
 
-          if(existingPackageJson.indexOf('angular-in-memory-web-api') === -1) {
+          if (existingPackageJson.indexOf('angular-in-memory-web-api') === -1) {
             const updatedContent = packageTemplate.replace(
               /clientPackageManager/g,
               this.jhipsterAppConfig.clientPackageManager
@@ -125,7 +126,8 @@ module.exports = class extends BaseGenerator {
       },
       updateWebpackConfig() {
 
-        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+        if (this.jhipsterAppConfig.applicationType === 'gateway'
+          && this.jhipsterAppConfig.clientFramework === 'angularX') {
           const existingWebpackCommonContent = this.fs.read(this.destinationPath('webpack/webpack.common.js'), {
             defaults: 'dummy'
           });
@@ -155,7 +157,8 @@ module.exports = class extends BaseGenerator {
       },
       updateFrontendFiles() {
 
-        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+        if (this.jhipsterAppConfig.applicationType === 'gateway'
+          && this.jhipsterAppConfig.clientFramework === 'angularX') {
 
           const clientDir = jhipsterConstants.CLIENT_MAIN_SRC_DIR;
           const existingConstantsContent = this.fs.read(this.destinationPath(`${clientDir}/app/app.constants.ts`), {
@@ -165,8 +168,8 @@ module.exports = class extends BaseGenerator {
           if (existingConstantsContent !== 'dummy'
             && existingConstantsContent.indexOf('BUILD_PROFILE') === -1) {
             this.fs.append(this.destinationPath(`${clientDir}/app/app.constants.ts`),
-            'export const BUILD_PROFILE = process.env.BUILD_PROFILE;\n',
-            { trimEnd: false });
+              'export const BUILD_PROFILE = process.env.BUILD_PROFILE;\n',
+              { trimEnd: false });
           }
 
           // update core.module
@@ -205,7 +208,8 @@ module.exports = class extends BaseGenerator {
         }
       },
       copyInMemoryDataService() {
-        if(this.jhipsterAppConfig.applicationType === 'gateway') {
+        if (this.jhipsterAppConfig.applicationType === 'gateway'
+          && this.jhipsterAppConfig.clientFramework === 'angularX') {
           this.fs.copyTpl(
             this.templatePath('in-memory-data.service.ts.ejs'),
             this.destinationPath(`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`),
@@ -217,7 +221,8 @@ module.exports = class extends BaseGenerator {
   }
 
   install() {
-    if(this.jhipsterAppConfig.applicationType === 'gateway') {
+    if (this.jhipsterAppConfig.applicationType === 'gateway'
+      && this.jhipsterAppConfig.clientFramework === 'angularX') {
       this.log(`Install dependencies using: ${chalk.yellow.bold(`${this.jhipsterAppConfig.clientPackageManager} install`)}`);
 
       if (this.jhipsterAppConfig.clientPackageManager === 'yarn') {
@@ -225,13 +230,14 @@ module.exports = class extends BaseGenerator {
       } else {
         this.npmInstall();
       }
+    }
   }
-}
 
   end() {
     this.log('Standalone profile successfully configured in your JHipster application.');
     this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do backend development in the standalone mode`);
-    if(this.jhipsterAppConfig.applicationType === 'gateway') {
+    if (this.jhipsterAppConfig.applicationType === 'gateway'
+      && this.jhipsterAppConfig.clientFramework === 'angularX') {
       this.log(`Use command ${chalk.bold.yellow('yarn start:standalone')} to do frontend development in the standalone mode`);
     }
   }

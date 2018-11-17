@@ -4,7 +4,7 @@
       "packageName": "test",
       "nativeLanguage": "en"
     },
-    "jhipsterVersion": "5.1.0",
+    "jhipsterVersion": "5.4.2",
     "applicationType": "microservice",
     "baseName": "msvc",
     "packageName": "test",

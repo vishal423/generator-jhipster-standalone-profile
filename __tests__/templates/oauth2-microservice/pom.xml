@@ -22,29 +22,6 @@
         <!-- jhipster-needle-maven-property -->
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.github.jhipster</groupId>
-                <artifactId>jhipster-dependencies</artifactId>
-                <version>${jhipster-dependencies.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- jhipster-needle-maven-add-dependency-management -->
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.github.jhipster</groupId>
-            <artifactId>jhipster-framework</artifactId>
-        </dependency>
-        <!-- jhipster-needle-maven-add-dependency -->
-    </dependencies>
-
-    <build>
-        <defaultGoal>spring-boot:run</defaultGoal>
     <profiles>
         <profile>
             <id>no-liquibase</id>

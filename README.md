@@ -1,9 +1,9 @@
 # generator-jhipster-standalone-profile [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url] [![code style: prettier][prettier-image]][prettier-url]
-> Adds Standalone profile support in Jhipster applications
+> Adds Standalone profile support in JHipster applications
 
 # Introduction
 
-This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. During development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `Jhipster Registry` and `UAA` / `OpenID Connect` server. Horizontal scaling, security are not concerns during development and often adds an additional overhead.
+This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. During development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `JHipster Registry` and `UAA` / `OpenID Connect` server. Horizontal scaling, security are not concerns during development and often adds an additional overhead.
 
 ## Services
 
@@ -17,7 +17,7 @@ This module supports following authentication types:
 >Note: On `gateway` application type, security is not disabled.
 
 This module supports following discovery services:
-- Jhipster Registry (Eureka)
+- JHipster Registry (Eureka)
 
 ## Frontend
 
@@ -29,7 +29,7 @@ This module leverages angular [in-memory-web-api](https://github.com/angular/in-
 
 # Pre-requisites
 
-This guide assumes that you have already setup a Jhipster application.
+This guide assumes that you have already setup a JHipster application.
 
 # Installation
 
@@ -39,10 +39,10 @@ Use following command to globally install this module:
 yarn global add generator-jhipster-standalone-profile
 ```
 >Note:
-If you are using Jhipster v4.14.x generated applications, then, use 1.x version.
+If you are using JHipster v4.14.x generated applications, then, use 1.x version.
 
 # Usage
-- Navigate to Jhipster application root directory.
+- Navigate to JHipster application root directory.
 - Use following command to add standalone profile support:
 
   ```bash
