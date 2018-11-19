@@ -25,7 +25,7 @@
     "jwtSecretKey": "<>",
     "clientFramework": "angularX",
     "useSass": false,
-    "clientPackageManager": "yarn",
+    "clientPackageManager": "npm",
     "applicationType": "monolith",
     "testFrameworks": [],
     "jhiPrefix": "jhi",

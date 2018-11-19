@@ -17,6 +17,8 @@ module.exports = class extends BaseGenerator {
       }
     }
     this.srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${this.jhipsterAppConfig.packageFolder}/config/`;
+    this.clientPackageManagerPrefix = this.jhipsterAppConfig.clientPackageManager === 'yarn' ? 'yarn' : 'npm run';
+    this.clientPackageManagerOptionsPrefix = this.jhipsterAppConfig.clientPackageManager === 'yarn' ? '' : ' -- ';
   }
 
   get initializing() {
@@ -94,7 +96,7 @@ module.exports = class extends BaseGenerator {
 
           updatedContent = updatedContent.replace(
             /%clientPackageManager%/g,
-            this.jhipsterAppConfig.clientPackageManager
+            this.clientPackageManagerPrefix
           );
           this.fs.write(this.destinationPath('README.md'), updatedContent);
         }
@@ -110,15 +112,20 @@ module.exports = class extends BaseGenerator {
       },
       updatePackageJson() {
 
-        if (this.jhipsterAppConfig.applicationType === 'gateway'
+        if (!this.jhipsterAppConfig.skipClient
           && this.jhipsterAppConfig.clientFramework === 'angularX') {
           const packageTemplate = this.fs.read(this.templatePath('package.json'));
           const existingPackageJson = this.fs.read(this.destinationPath('package.json'), { defaults: 'dummy' });
 
           if (existingPackageJson.indexOf('angular-in-memory-web-api') === -1) {
-            const updatedContent = packageTemplate.replace(
-              /clientPackageManager/g,
+            let updatedContent = packageTemplate.replace(
+              /%clientPackageManager%/g,
               this.jhipsterAppConfig.clientPackageManager
+            );
+
+            updatedContent = updatedContent.replace(
+              /%clientPackageManagerOptionsPrefix%/g,
+              this.clientPackageManagerOptionsPrefix
             );
             this.fs.extendJSON(this.destinationPath('package.json'), JSON.parse(updatedContent));
           }
@@ -126,7 +133,7 @@ module.exports = class extends BaseGenerator {
       },
       updateWebpackConfig() {
 
-        if (this.jhipsterAppConfig.applicationType === 'gateway'
+        if (!this.jhipsterAppConfig.skipClient
           && this.jhipsterAppConfig.clientFramework === 'angularX') {
           const existingWebpackCommonContent = this.fs.read(this.destinationPath('webpack/webpack.common.js'), {
             defaults: 'dummy'
@@ -157,7 +164,7 @@ module.exports = class extends BaseGenerator {
       },
       updateFrontendFiles() {
 
-        if (this.jhipsterAppConfig.applicationType === 'gateway'
+        if (!this.jhipsterAppConfig.skipClient
           && this.jhipsterAppConfig.clientFramework === 'angularX') {
 
           const clientDir = jhipsterConstants.CLIENT_MAIN_SRC_DIR;
@@ -208,7 +215,7 @@ module.exports = class extends BaseGenerator {
         }
       },
       copyInMemoryDataService() {
-        if (this.jhipsterAppConfig.applicationType === 'gateway'
+        if (!this.jhipsterAppConfig.skipClient
           && this.jhipsterAppConfig.clientFramework === 'angularX') {
           this.fs.copyTpl(
             this.templatePath('in-memory-data.service.ts.ejs'),
@@ -221,7 +228,7 @@ module.exports = class extends BaseGenerator {
   }
 
   install() {
-    if (this.jhipsterAppConfig.applicationType === 'gateway'
+    if (!this.jhipsterAppConfig.skipClient
       && this.jhipsterAppConfig.clientFramework === 'angularX') {
       this.log(`Install dependencies using: ${chalk.yellow.bold(`${this.jhipsterAppConfig.clientPackageManager} install`)}`);
 
@@ -235,10 +242,10 @@ module.exports = class extends BaseGenerator {
 
   end() {
     this.log('Standalone profile successfully configured in your JHipster application.');
-    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} to do backend development in the standalone mode`);
-    if (this.jhipsterAppConfig.applicationType === 'gateway'
+    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} for backend development in the standalone mode`);
+    if (!this.jhipsterAppConfig.skipClient
       && this.jhipsterAppConfig.clientFramework === 'angularX') {
-      this.log(`Use command ${chalk.bold.yellow('yarn start:standalone')} to do frontend development in the standalone mode`);
+      this.log(`Use command ${chalk.bold.yellow(`${this.clientPackageManagerPrefix} start:standalone`)} for frontend development in the standalone mode`);
     }
   }
 };

@@ -1,0 +1,8 @@
+{
+  "global": {
+    "title": "tst",
+    "ribbon": {
+      "dev": "Development"
+    }
+  }
+}

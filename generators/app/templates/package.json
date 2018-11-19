@@ -4,6 +4,6 @@
     "@angular/http": "6.1.0"
   },
   "scripts": {
-    "start:standalone": "clientPackageManager run webpack:dev --env.profile=standalone"
+    "start:standalone": "%clientPackageManager% run webpack:dev %clientPackageManagerOptionsPrefix% --env.profile=standalone"
   }
 }
