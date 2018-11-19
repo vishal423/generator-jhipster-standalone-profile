@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "angular-in-memory-web-api": "0.6.1",
-    "@angular/http": "6.1.0"
+    "angular-in-memory-web-api": "0.7.0",
+    "@angular/http": "7.0.0"
   },
   "scripts": {
     "start:standalone": "%clientPackageManager% run webpack:dev %clientPackageManagerOptionsPrefix% --env.profile=standalone"

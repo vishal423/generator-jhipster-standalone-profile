@@ -37,8 +37,8 @@ describe('generator-jhipster-standalone-profile:app', () => {
 
         assert.fileContent(`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}i18n/en/global.json`, `"standalone": "Standalone"`);
 
-        assert.fileContent('package.json', /"angular-in-memory-web-api":\s*"0\.6\.1"/);
-        assert.fileContent('package.json', /"@angular\/http":\s*"6\.1\.0"/);
+        assert.fileContent('package.json', /"angular-in-memory-web-api":\s*"0\.7\.0"/);
+        assert.fileContent('package.json', /"@angular\/http":\s*"7\.0\.0"/);
         assert.fileContent(
           'package.json',
           /"start:standalone":\s*"npm\s*run\s*webpack:dev\s*--\s*--env\.profile=standalone"/
