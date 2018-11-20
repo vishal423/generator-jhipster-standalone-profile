@@ -28,15 +28,41 @@ module.exports = class extends BaseGenerator {
       },
       banner() {
         /* eslint-disable */
-        this.log(`${chalk.green('███████  ████████     ██      ██     ██  ██████         ██      ██       ███████   ██     ██  ██████ ')}`);
-        this.log(`${chalk.green('██          ██       ████     ███    ██  ██    ██      ████     ██      ██     ██  ███    ██  ██     ')}`);
-        this.log(`${chalk.green('███████     ██      ██  ██    ██ ██  ██  ██     ██    ██  ██    ██      ██     ██  ██ ██  ██  █████  ')}`);
-        this.log(`${chalk.green('     ██     ██     ████████   ██   ████  ██    ██    ████████   ██      ██     ██  ██   ████  ██     ')}`);
-        this.log(`${chalk.green('███████     ██    ██      ██  ██     ██  ██████     ██      ██  ██████   ███████   ██     ██  ██████ ')}`);
+        this.log(
+          `${chalk.green(`
+    ███████  ████████     ██      ██     ██  ██████         ██      ██       ███████   ██     ██  ██████
+    ██          ██       ████     ███    ██  ██    ██      ████     ██      ██     ██  ███    ██  ██
+    ███████     ██      ██  ██    ██ ██  ██  ██     ██    ██  ██    ██      ██     ██  ██ ██  ██  █████
+         ██     ██     ████████   ██   ████  ██    ██    ████████   ██      ██     ██  ██   ████  ██
+    ███████     ██    ██      ██  ██     ██  ██████     ██      ██  ██████   ███████   ██     ██  ██████`)}`
+        );
         /* eslint-disable */
-        this.log(`Welcome to the ${chalk.bold.green('Standalone profile')} ${chalk.yellow(`v${standalonePackageJson.version}`)} configurer!`);
+        this.log(
+          `Welcome to the ${chalk.bold.green('Standalone profile')} ${chalk.yellow(
+            `v${standalonePackageJson.version}`
+          )} configurer!`
+        );
       }
     };
+  }
+
+  async prompting() {
+    this.answers = {};
+    if (
+      !this.jhipsterAppConfig.skipClient &&
+      this.jhipsterAppConfig.clientFramework === 'angularX' &&
+      this.config.get('client') === undefined
+    ) {
+      this.answers = await this.prompt({
+        type: 'confirm',
+        name: 'client',
+        message: 'Would you like to enable standalone profile on client side?'
+      });
+    }
+    this.config.set({
+      version: standalonePackageJson.version,
+      client: this.answers.client !== undefined ? this.answers.client : false
+    });
   }
 
   get writing() {
@@ -94,10 +120,7 @@ module.exports = class extends BaseGenerator {
             newContent
           );
 
-          updatedContent = updatedContent.replace(
-            /%clientPackageManager%/g,
-            this.clientPackageManagerPrefix
-          );
+          updatedContent = updatedContent.replace(/%clientPackageManager%/g, this.clientPackageManagerPrefix);
           this.fs.write(this.destinationPath('README.md'), updatedContent);
         }
       },
@@ -111,9 +134,7 @@ module.exports = class extends BaseGenerator {
         }
       },
       updatePackageJson() {
-
-        if (!this.jhipsterAppConfig.skipClient
-          && this.jhipsterAppConfig.clientFramework === 'angularX') {
+        if (this.answers.client) {
           const packageTemplate = this.fs.read(this.templatePath('package.json'));
           const existingPackageJson = this.fs.read(this.destinationPath('package.json'), { defaults: 'dummy' });
 
@@ -132,9 +153,7 @@ module.exports = class extends BaseGenerator {
         }
       },
       updateWebpackConfig() {
-
-        if (!this.jhipsterAppConfig.skipClient
-          && this.jhipsterAppConfig.clientFramework === 'angularX') {
+        if (this.answers.client) {
           const existingWebpackCommonContent = this.fs.read(this.destinationPath('webpack/webpack.common.js'), {
             defaults: 'dummy'
           });
@@ -142,7 +161,7 @@ module.exports = class extends BaseGenerator {
           if (existingWebpackCommonContent !== 'dummy') {
             const updatedWebpackCommonContent = existingWebpackCommonContent.replace(
               /SERVER_API_URL:\s*`''`\s*(,\n\s*BUILD_PROFILE:\s*`'\$\{options.profile\}'`)?/g,
-              'SERVER_API_URL: `\'\'`,\n                BUILD_PROFILE: `\'${options.profile}\'`'
+              "SERVER_API_URL: `''`,\n                BUILD_PROFILE: `'${options.profile}'`"
             );
 
             this.fs.write(this.destinationPath('webpack/webpack.common.js'), updatedWebpackCommonContent);
@@ -163,20 +182,18 @@ module.exports = class extends BaseGenerator {
         }
       },
       updateFrontendFiles() {
-
-        if (!this.jhipsterAppConfig.skipClient
-          && this.jhipsterAppConfig.clientFramework === 'angularX') {
-
+        if (this.answers.client) {
           const clientDir = jhipsterConstants.CLIENT_MAIN_SRC_DIR;
           const existingConstantsContent = this.fs.read(this.destinationPath(`${clientDir}/app/app.constants.ts`), {
             defaults: 'dummy'
           });
 
-          if (existingConstantsContent !== 'dummy'
-            && existingConstantsContent.indexOf('BUILD_PROFILE') === -1) {
-            this.fs.append(this.destinationPath(`${clientDir}/app/app.constants.ts`),
+          if (existingConstantsContent !== 'dummy' && existingConstantsContent.indexOf('BUILD_PROFILE') === -1) {
+            this.fs.append(
+              this.destinationPath(`${clientDir}/app/app.constants.ts`),
               'export const BUILD_PROFILE = process.env.BUILD_PROFILE;\n',
-              { trimEnd: false });
+              { trimEnd: false }
+            );
           }
 
           // update core.module
@@ -211,12 +228,10 @@ module.exports = class extends BaseGenerator {
 
             this.fs.write(this.destinationPath(`${clientDir}/i18n/en/global.json`), updatedI18nContent);
           }
-
         }
       },
       copyInMemoryDataService() {
-        if (!this.jhipsterAppConfig.skipClient
-          && this.jhipsterAppConfig.clientFramework === 'angularX') {
+        if (this.answers.client) {
           this.fs.copyTpl(
             this.templatePath('in-memory-data.service.ts.ejs'),
             this.destinationPath(`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`),
@@ -228,9 +243,10 @@ module.exports = class extends BaseGenerator {
   }
 
   install() {
-    if (!this.jhipsterAppConfig.skipClient
-      && this.jhipsterAppConfig.clientFramework === 'angularX') {
-      this.log(`Install dependencies using: ${chalk.yellow.bold(`${this.jhipsterAppConfig.clientPackageManager} install`)}`);
+    if (this.answers.client) {
+      this.log(
+        `Install dependencies using: ${chalk.yellow.bold(`${this.jhipsterAppConfig.clientPackageManager} install`)}`
+      );
 
       if (this.jhipsterAppConfig.clientPackageManager === 'yarn') {
         this.yarnInstall();
@@ -242,10 +258,15 @@ module.exports = class extends BaseGenerator {
 
   end() {
     this.log('Standalone profile successfully configured in your JHipster application.');
-    this.log(`Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} for backend development in the standalone mode`);
-    if (!this.jhipsterAppConfig.skipClient
-      && this.jhipsterAppConfig.clientFramework === 'angularX') {
-      this.log(`Use command ${chalk.bold.yellow(`${this.clientPackageManagerPrefix} start:standalone`)} for frontend development in the standalone mode`);
+    this.log(
+      `Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} for backend development in the standalone mode`
+    );
+    if (this.answers.client) {
+      this.log(
+        `Use command ${chalk.bold.yellow(
+          `${this.clientPackageManagerPrefix} start:standalone`
+        )} for frontend development in the standalone mode`
+      );
     }
   }
 };
