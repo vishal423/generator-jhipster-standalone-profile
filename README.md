@@ -58,7 +58,11 @@ If you are using JHipster v4.14.x generated applications, then, use 1.x version.
   ```
 - Use following command to start angular frontend in the standalone mode:
   ```bash
-  yarn|npm start:standalone
+  yarn start:standalone
+  ```
+  or
+  ```bash
+  npm run start:standalone
   ```
 ## License
 
