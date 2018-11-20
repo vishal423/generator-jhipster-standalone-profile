@@ -3,7 +3,11 @@
 
 # Introduction
 
-This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. During development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `JHipster Registry` and `UAA` / `OpenID Connect` server. Horizontal scaling, security are not concerns during development and often adds an additional overhead.
+This is a [JHipster](https://www.jhipster.tech/) module, that is meant to be used in a JHipster application. 
+
+During services development, especially in micro-service architecture, to access secure micro-service endpoint, you often need to start `JHipster Registry` and `UAA` / `OpenID Connect` server. Horizontal scaling, security are not concerns during development and often adds an additional overhead. This module helps you to bypass these concerns with an add-on profile.
+
+Similarly, during frontend development, especially in micro-services architecture, to access RESTful services, you need to start `micro-service(s)`, `gateway`, `JHipster Registry`, and `UAA` / `OpenID Connect` server. In general, you only require service contract (request, response, headers etc) and can build fully functional client applications with this information. `standalone` profile on frontend helps you to achieve this by stubbing RESTful calls.
 
 ## Services
 
@@ -22,10 +26,9 @@ This module supports following discovery services:
 ## Frontend
 
 ### Angular
-This module leverages angular [in-memory-web-api](https://github.com/angular/in-memory-web-api) module to intercept HTTP requests. To intercept service calls and return mock response, you need to specify collections under:
-```src/main/webapp/app/core/in-memory-data.service.ts```. For more details, refer [in-memory-web-api](https://github.com/angular/in-memory-web-api) documentation. 
+This module leverages angular [in-memory-web-api](https://github.com/angular/in-memory-web-api) module to intercept HTTP requests. This module stubs calls to `api/account` and `management/info` endpoints and allow you to directly access secured pages. You can follow similar approach to intercept custom entity endpoints. You need to specify custom collections under: ```src/main/webapp/app/core/in-memory-data.service.ts```.
 
->Note: Only `gateway` application type is supported.
+For more details, refer [in-memory-web-api](https://github.com/angular/in-memory-web-api) documentation. 
 
 # Pre-requisites
 
