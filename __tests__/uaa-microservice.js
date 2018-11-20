@@ -12,6 +12,7 @@ describe('generator-jhipster-standalone-profile:app', () => {
       .inTmpDir(dir => {
         fs.copySync(path.join(__dirname, './templates/uaa-microservice/'), dir);
       })
+      .withPrompts({ client: false, server: true })
       .then(() => {
         assert.file([`${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`]);
         assert.fileContent('pom.xml', /dev,standalone\${profile.swagger}\${profile.no-liquibase}/);

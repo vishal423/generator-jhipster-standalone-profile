@@ -47,94 +47,116 @@ module.exports = class extends BaseGenerator {
   }
 
   async prompting() {
-    this.answers = {};
+    this.options = {
+      client: this.config.get('client'),
+      server: this.config.get('server')
+    };
     if (
       !this.jhipsterAppConfig.skipClient &&
       this.jhipsterAppConfig.clientFramework === 'angularX' &&
-      this.config.get('client') === undefined
+      this.options.client === undefined
     ) {
-      this.answers = await this.prompt({
+      const clientPrompt = await this.prompt({
         type: 'confirm',
         name: 'client',
         message: 'Would you like to enable standalone profile on client side?'
       });
+      this.options.client = clientPrompt.client || false;
+    }
+    if (this.options.server === undefined) {
+      const serverPrompt = await this.prompt(
+        {
+          type: 'confirm',
+          name: 'server',
+          message: 'Would you like to enable standalone profile on server side?'
+        });
+      this.options.server = serverPrompt.server || false;
     }
     this.config.set({
       version: standalonePackageJson.version,
-      client: this.answers.client !== undefined ? this.answers.client : false
+      client: this.options.client,
+      server: this.options.server
     });
   }
 
   get writing() {
     return {
       handleWebAppSecurityConfiguration() {
-        const existingContent = this.fs.read(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), {
-          defaults: 'dummy'
-        });
-        if (existingContent !== 'dummy') {
-          if (
-            existingContent.indexOf('@EnableWebSecurity') !== -1 ||
-            existingContent.indexOf('@EnableResourceServer') !== -1
-          ) {
-            this.fs.copyTpl(
-              this.templatePath('StandaloneSecurityConfiguration.java.ejs'),
-              this.destinationPath(`${this.srcConfigPath}StandaloneSecurityConfiguration.java`),
-              this.jhipsterAppConfig
-            );
-
-            if (existingContent.indexOf('@Profile("!standalone")') === -1) {
-              let updatedContent = existingContent.replace(
-                /@EnableWebSecurity\n(@Profile\("!standalone"\)\n)?/g,
-                '@EnableWebSecurity\n@Profile("!standalone")\n'
-              );
-              updatedContent = updatedContent.replace(
-                /@EnableResourceServer\n(@Profile\("!standalone"\)\n)?/g,
-                '@EnableResourceServer\n@Profile("!standalone")\n'
+        if (this.options.server) {
+          const existingContent = this.fs.read(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), {
+            defaults: 'dummy'
+          });
+          if (existingContent !== 'dummy') {
+            if (
+              existingContent.indexOf('@EnableWebSecurity') !== -1 ||
+              existingContent.indexOf('@EnableResourceServer') !== -1
+            ) {
+              this.fs.copyTpl(
+                this.templatePath('StandaloneSecurityConfiguration.java.ejs'),
+                this.destinationPath(`${this.srcConfigPath}StandaloneSecurityConfiguration.java`),
+                this.jhipsterAppConfig
               );
 
-              if (updatedContent.indexOf('import org.springframework.context.annotation.Profile;') === -1) {
-                updatedContent = updatedContent.replace(
-                  /import\sorg\.springframework\.context\.annotation\.Configuration;\n(import\sorg\.springframework\.context\.annotation\.Profile;\n)?/g,
-                  'import org.springframework.context.annotation.Configuration;\nimport org.springframework.context.annotation.Profile;\n'
+              if (existingContent.indexOf('@Profile("!standalone")') === -1) {
+                let updatedContent = existingContent.replace(
+                  /@EnableWebSecurity\n(@Profile\("!standalone"\)\n)?/g,
+                  '@EnableWebSecurity\n@Profile("!standalone")\n'
                 );
+                updatedContent = updatedContent.replace(
+                  /@EnableResourceServer\n(@Profile\("!standalone"\)\n)?/g,
+                  '@EnableResourceServer\n@Profile("!standalone")\n'
+                );
+
+                if (updatedContent.indexOf('import org.springframework.context.annotation.Profile;') === -1) {
+                  updatedContent = updatedContent.replace(
+                    /import\sorg\.springframework\.context\.annotation\.Configuration;\n(import\sorg\.springframework\.context\.annotation\.Profile;\n)?/g,
+                    'import org.springframework.context.annotation.Configuration;\nimport org.springframework.context.annotation.Profile;\n'
+                  );
+                }
+                this.fs.write(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), updatedContent);
               }
-              this.fs.write(this.destinationPath(`${this.srcConfigPath}SecurityConfiguration.java`), updatedContent);
             }
           }
         }
       },
       copySpringProfileConfiguration() {
-        const configPath = `${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`;
-        this.fs.copyTpl(
-          this.templatePath('application-standalone.yml.ejs'),
-          this.destinationPath(configPath),
-          this.jhipsterAppConfig
-        );
+        if (this.options.server) {
+          const configPath = `${jhipsterConstants.SERVER_MAIN_RES_DIR}config/application-standalone.yml`;
+          this.fs.copyTpl(
+            this.templatePath('application-standalone.yml.ejs'),
+            this.destinationPath(configPath),
+            this.jhipsterAppConfig
+          );
+        }
       },
       updateReadme() {
-        const newContent = this.fs.read(this.templatePath('README.md.ejs'));
-        const existingContent = this.fs.read(this.destinationPath('README.md'), { defaults: 'dummy' });
-        if (existingContent !== 'dummy') {
-          let updatedContent = existingContent.replace(
-            /(#?## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*)?## Building for production\n/g,
-            newContent
-          );
+        if (this.options.server) {
+          const newContent = this.fs.read(this.templatePath('README.md.ejs'));
+          const existingContent = this.fs.read(this.destinationPath('README.md'), { defaults: 'dummy' });
+          if (existingContent !== 'dummy') {
+            let updatedContent = existingContent.replace(
+              /(#?## Standalone Development([\n\t\sa-zA-Z0-9,\-: ./()[\]])*)?## Building for production\n/g,
+              newContent
+            );
 
-          updatedContent = updatedContent.replace(/%clientPackageManager%/g, this.clientPackageManagerPrefix);
-          this.fs.write(this.destinationPath('README.md'), updatedContent);
+            updatedContent = updatedContent.replace(/%clientPackageManager%/g, this.clientPackageManagerPrefix);
+            this.fs.write(this.destinationPath('README.md'), updatedContent);
+          }
         }
       },
       addMavenProfile() {
-        const buildTool = this.jhipsterAppConfig.buildTool;
-        if (buildTool === 'maven') {
-          const newContent = this.fs.read(this.templatePath('pom-profile.xml.ejs'));
-          this.addMavenProfile('standalone', `            ${newContent.trim()}`);
-        } else {
-          this.error(`Unsupported build tool : ${buildTool}`);
+        if (this.options.server) {
+          const buildTool = this.jhipsterAppConfig.buildTool;
+          if (buildTool === 'maven') {
+            const newContent = this.fs.read(this.templatePath('pom-profile.xml.ejs'));
+            this.addMavenProfile('standalone', `            ${newContent.trim()}`);
+          } else {
+            this.error(`Unsupported build tool : ${buildTool}`);
+          }
         }
       },
       updatePackageJson() {
-        if (this.answers.client) {
+        if (this.options.client) {
           const packageTemplate = this.fs.read(this.templatePath('package.json'));
           const existingPackageJson = this.fs.read(this.destinationPath('package.json'), { defaults: 'dummy' });
 
@@ -153,7 +175,7 @@ module.exports = class extends BaseGenerator {
         }
       },
       updateWebpackConfig() {
-        if (this.answers.client) {
+        if (this.options.client) {
           const existingWebpackCommonContent = this.fs.read(this.destinationPath('webpack/webpack.common.js'), {
             defaults: 'dummy'
           });
@@ -182,7 +204,7 @@ module.exports = class extends BaseGenerator {
         }
       },
       updateFrontendFiles() {
-        if (this.answers.client) {
+        if (this.options.client) {
           const clientDir = jhipsterConstants.CLIENT_MAIN_SRC_DIR;
           const existingConstantsContent = this.fs.read(this.destinationPath(`${clientDir}/app/app.constants.ts`), {
             defaults: 'dummy'
@@ -231,7 +253,7 @@ module.exports = class extends BaseGenerator {
         }
       },
       copyInMemoryDataService() {
-        if (this.answers.client) {
+        if (this.options.client) {
           this.fs.copyTpl(
             this.templatePath('in-memory-data.service.ts.ejs'),
             this.destinationPath(`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`),
@@ -243,7 +265,7 @@ module.exports = class extends BaseGenerator {
   }
 
   install() {
-    if (this.answers.client) {
+    if (this.options.client) {
       this.log(
         `Install dependencies using: ${chalk.yellow.bold(`${this.jhipsterAppConfig.clientPackageManager} install`)}`
       );
@@ -258,10 +280,12 @@ module.exports = class extends BaseGenerator {
 
   end() {
     this.log('Standalone profile successfully configured in your JHipster application.');
-    this.log(
-      `Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} for backend development in the standalone mode`
-    );
-    if (this.answers.client) {
+    if (this.options.server) {
+      this.log(
+        `Use command ${chalk.bold.yellow('./mvnw -Pdev,standalone')} for backend development in the standalone mode`
+      );
+    }
+    if (this.options.client) {
       this.log(
         `Use command ${chalk.bold.yellow(
           `${this.clientPackageManagerPrefix} start:standalone`

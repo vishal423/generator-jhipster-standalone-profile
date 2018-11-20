@@ -12,6 +12,10 @@ describe('generator-jhipster-standalone-profile:app', () => {
       .inTmpDir(dir => {
         fs.copySync(path.join(__dirname, './templates/oauth2-gateway/'), dir);
       })
+      .withPrompts({ client: true, server: true })
+      .on('ready', gen => {
+        gen.yarnInstall = () => {};
+      })
       .then(() => {
         assert.file([`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`]);
         assert.fileContent('package.json', /"angular-in-memory-web-api":\s*"0\.7\.0"/);
