@@ -231,7 +231,7 @@ module.exports = class extends BaseGenerator {
             //(,\n\s*([\n\s\tA-Za-z0-9='_\-?.\():\{\}])*\[])?
             updatedCoreModuleContent = updatedCoreModuleContent.replace(
               /imports:\s*\[\s*\n?\s*HttpClientModule(,([\n\s\tA-Za-z0-9='_\-?.,\():\{\}])*\[]\s*)?/g,
-              `imports: [\n        HttpClientModule,\n        BUILD_PROFILE === 'standalone'\n            ? HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, { delay: 2000, passThruUnknownUrl: true })\n            : []\n    `
+              `imports: [\n        HttpClientModule,\n        BUILD_PROFILE === 'standalone'\n            ? HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, { delay: 500, passThruUnknownUrl: true, put204: false, post204: false })\n            : []\n    `
             );
 
             this.fs.write(this.destinationPath(`${clientDir}/app/core/core.module.ts`), updatedCoreModuleContent);
