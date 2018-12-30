@@ -16,9 +16,13 @@ module.exports = class extends BaseGenerator {
         this.error('.yo-rc.json not found');
       }
     }
-    this.srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${this.jhipsterAppConfig.packageFolder}/config/`;
-    this.clientPackageManagerPrefix = this.jhipsterAppConfig.clientPackageManager === 'yarn' ? 'yarn' : 'npm run';
-    this.clientPackageManagerOptionsPrefix = this.jhipsterAppConfig.clientPackageManager === 'yarn' ? '' : ' -- ';
+    this.srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${
+      this.jhipsterAppConfig.packageFolder
+    }/config/`;
+    this.clientPackageManagerPrefix =
+      this.jhipsterAppConfig.clientPackageManager === 'yarn' ? 'yarn' : 'npm run';
+    this.clientPackageManagerOptionsPrefix =
+      this.jhipsterAppConfig.clientPackageManager === 'yarn' ? '' : ' -- ';
   }
 
   get initializing() {

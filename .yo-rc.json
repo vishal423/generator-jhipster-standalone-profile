@@ -1,9 +1,11 @@
 {
-  "generator-node": {
-    "promptValues": {
-      "authorName": "Vishal Mahajan",
-      "authorEmail": "vishal423@gmail.com",
-      "authorUrl": ""
-    }
+  "generator-codegen": {
+    "version": "0.2.1",
+    "name": "Vishal Mahajan",
+    "email": "vishal423@gmail.com",
+    "githubUsername": "vishal423",
+    "type": "jhipster-module",
+    "generatorName": "standalone-profile",
+    "description": "Adds standalone profile to Jhipster application"
   }
 }

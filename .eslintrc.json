@@ -1,0 +1,7 @@
+{
+  "extends": ["xo/esnext", "plugin:prettier/recommended"],
+  "env": {
+    "node": true,
+    "jest": true
+  }
+}

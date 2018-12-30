@@ -22,12 +22,20 @@ describe('generator-jhipster-standalone-profile:app', () => {
         const fileData = fs.readJSONSync('.yo-rc.json');
         if (fileData && fileData['generator-jhipster']) {
           const jhipsterConfig = fileData['generator-jhipster'];
-          const srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${jhipsterConfig.packageFolder}/config/`;
+          const srcConfigPath = `${jhipsterConstants.SERVER_MAIN_SRC_DIR}${
+            jhipsterConfig.packageFolder
+          }/config/`;
 
           assert.file([`${srcConfigPath}StandaloneSecurityConfiguration.java`]);
-          assert.fileContent(`${srcConfigPath}StandaloneSecurityConfiguration.java`, /@Profile\("standalone"\)/);
+          assert.fileContent(
+            `${srcConfigPath}StandaloneSecurityConfiguration.java`,
+            /@Profile\("standalone"\)/
+          );
 
-          assert.fileContent(`${srcConfigPath}SecurityConfiguration.java`, /@Profile\("!standalone"\)/);
+          assert.fileContent(
+            `${srcConfigPath}SecurityConfiguration.java`,
+            /@Profile\("!standalone"\)/
+          );
         }
       });
   });

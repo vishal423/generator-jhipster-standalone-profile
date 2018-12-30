@@ -17,9 +17,10 @@ describe('generator-jhipster-standalone-profile:app', () => {
         gen.yarnInstall = () => {};
       })
       .then(() => {
-        assert.file([`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`]);
-        assert.fileContent('package.json', /"angular-in-memory-web-api":\s*"0\.7\.0"/);
-        assert.fileContent('package.json', /"@angular\/http":\s*"7\.0\.0"/);
+        assert.file([
+          `${jhipsterConstants.CLIENT_MAIN_SRC_DIR}/app/core/in-memory-data.service.ts`
+        ]);
+        assert.fileContent('package.json', /"angular-in-memory-web-api":\s*"0\.8\.0"/);
         assert.fileContent(
           'package.json',
           /"start:standalone":\s*"yarn\s*run\s*webpack:dev\s*--env\.profile=standalone"/
@@ -44,7 +45,10 @@ describe('generator-jhipster-standalone-profile:app', () => {
           `BUILD_PROFILE === 'standalone'`
         );
 
-        assert.fileContent(`${jhipsterConstants.CLIENT_MAIN_SRC_DIR}i18n/en/global.json`, `"standalone": "Standalone"`);
+        assert.fileContent(
+          `${jhipsterConstants.CLIENT_MAIN_SRC_DIR}i18n/en/global.json`,
+          `"standalone": "Standalone"`
+        );
       });
   });
 });
