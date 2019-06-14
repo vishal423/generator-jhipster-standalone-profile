@@ -1,7 +1,10 @@
 {
-  "extends": ["xo/esnext", "plugin:prettier/recommended"],
+  "extends": ["plugin:prettier/recommended"],
   "env": {
     "node": true,
     "jest": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 9
   }
 }
